@@ -11,10 +11,19 @@ function App() {
     { name: 'five', id: '5' },
   ];
 
-  const [list, setList] = useState(data);
+  const [list, setList] = useState(() => {
+    return JSON.parse(localStorage.getItem('dragList')) || data;
+  });
 
-  const onEnd = (result) => {
-    console.log(result);
+  const onEnd = ({ destination, source }) => {
+    setList(reorderList(list, source.index, destination.index));
+    localStorage.setItem('dragList', JSON.stringify(list));
+  };
+
+  const reorderList = (arr, sourceIdx, destinationIdx) => {
+    const [removed] = arr.splice(sourceIdx, 1);
+    arr.splice(destinationIdx, 0, removed);
+    return arr;
   };
 
   return (
@@ -30,7 +39,15 @@ function App() {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    <div>{item.name}</div>
+                    <div
+                      style={{
+                        padding: '20px',
+                        margin: '20px',
+                        backgroundColor: 'red',
+                      }}
+                    >
+                      {item.name}
+                    </div>
                   </div>
                 )}
               </Draggable>
